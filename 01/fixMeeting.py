@@ -8,20 +8,13 @@ myUrl='https://www.psp.cz/sqw/'
 urlStart = myUrl + 'hlasovani.sqw?o=8'
 encodingType = 'windows-1250'
 
-voteCSV = "vote.csv"
-tmpVoteCSV = "tmp.csv"
-meetinCSV = "meeting.csv"
+meetinCSV = "newMeeting.csv"
 tmpMeetingCSV = "meetingtmp.csv"
 
-fVote = open(voteCSV, "a", encoding=encodingType)
-ftmp = open(tmpVoteCSV, "w", encoding=encodingType)
 fMeeting = open(meetinCSV, "a", encoding=encodingType)
 fMeetingtmp = open(tmpMeetingCSV, "w", encoding=encodingType)
 
 import os
-if(os.stat(voteCSV).st_size == 0) :
-    fVote.write('name,' + 'political party,' + 'topicID,' + 'vote' + '\n')
-
 if(os.stat(meetinCSV).st_size == 0) :
     fMeeting.write('topicID,' + 'topicName,' +  'meetingNum,' + 'votingDate' + '\n')
 
@@ -54,25 +47,8 @@ for i in range(len(containers)):
             meetingNum = meetingTopic.select("td")[0].text
             votingDate = meetingTopic.select("td")[4].text
 
-            start_time = time.time()
-            votingSoup = getSoup(myUrl + meetingTopic.a["href"])
-
-            votingContent = votingSoup.find("div", {"id" : "main-content"})
-
-            politParties = votingContent.find_all("h2", {"class" : "section-title center"})[1: - 1]
-
-            politPartyNames = [party.text.split(" (")[0] for party in politParties]
-            politPartiesVotes = votingContent.find_all("ul", {"class" : "results"})
-            votes = zip(politPartyNames, politPartiesVotes)
-
-            for v in votes:
-                for personVote in v[1].find_all("li"):
-                    ftmp.write( '"'  + personVote.a.text + '",' + v[0] + ',' + str(topicId) + ','  + personVote.span["class"][1] + '\n' )
-            
             fMeetingtmp.write(str(topicId) + ',' + votingTopic + ',' + meetingNum + ',' + votingDate + '\n')
-
             topicId += 1
-            sleep(max(0, 0.5 - (time.time() - start_time)))
 
         #checks if next pages exists, if yes then overwrites meetinghtml
         meetinghtml = ""
@@ -82,12 +58,6 @@ for i in range(len(containers)):
             if nextPage is not None :
                 meetinghtml = getSoup(myUrl + nextPage["href"])
                 pageNum +=1
-
-    ftmp.close()
-    ftmp = open(tmpVoteCSV, "r", encoding=encodingType)
-    fVote.write(ftmp.read())
-    ftmp.close()
-    ftmp = open(tmpVoteCSV, "w", encoding=encodingType)
 
     fMeetingtmp.close()
     fMeetingtmp = open(tmpMeetingCSV, "r", encoding=encodingType)
