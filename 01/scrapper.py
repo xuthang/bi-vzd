@@ -9,7 +9,8 @@ urlStart = myUrl + 'hlasovani.sqw?o=8'
 encodingType = 'windows-1250'
 
 voteCSV = "vote.csv"
-tmpVoteCSV = "tmp.csv"
+tmpVoteCSV = "votetmp.csv"
+
 meetinCSV = "meeting.csv"
 tmpMeetingCSV = "meetingtmp.csv"
 
